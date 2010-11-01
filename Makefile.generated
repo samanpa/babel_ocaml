@@ -1,0 +1,2 @@
+LLVMCONFIG=llvm-config
+LLVMOCAMLLIB=/usr/local/lib/ocaml
