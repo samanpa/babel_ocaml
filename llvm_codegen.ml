@@ -167,7 +167,7 @@ and codegen_expr_in_env env expr = match expr with
       let e1 = codegen_expr_in_env env e1 in
       let _  = Env.put env name e1 in
 	e1
-  | Lvar (_, nm) ->
+  | Lvar (nm) ->
       let nm = translate_name nm in
       begin
 	match Env.find env nm with

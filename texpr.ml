@@ -9,7 +9,7 @@ type fnDef = | Ext (* externally defined e.g. in C *)
  * suitable for code generation       *)
 and lty =   IntEx of int
 	   | UnitEx
-	   | VarEx of t * name
+	   | VarEx of name
 	   | CallEx of lty * lty
 	   | LamEx of t * name list * fnDef
 	   | IfEx of lty * lty * lty
@@ -45,7 +45,7 @@ let rec convert_from_astTy = function
 
 
 let rec string_of_lty = function 
-  | VarEx (_, nm)      -> nm
+  | VarEx (nm)      -> nm
  
   | UnitEx             -> "unit"
 

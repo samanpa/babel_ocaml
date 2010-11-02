@@ -12,7 +12,7 @@ let rec lambda_lift acc = function
 	    let fn = Lfn (nm, t, p, Def (b)) in
 	    let _ =       print_endline ("FN [[" ^ (to_string fn) ^ "]]")  in
 
-	      ((fn::acc), Lvar (t, nm))
+	      ((fn::acc), Lvar (nm))
       in
 	res
   | Lapply (fn, args) ->

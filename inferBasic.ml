@@ -13,7 +13,7 @@ let rec infer gamma = function
   | Var (nm)             -> 
       let _ = print_endline nm in
       let t = gammaFind gamma nm in
-	VarEx (convert_type t, nm), t
+	VarEx (nm), t
 
   | Let (nm, expr, body) ->
       let (expr, tp) = infer gamma expr in
