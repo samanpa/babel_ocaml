@@ -17,8 +17,6 @@ type exec_environment = {
   llcontext   : llcontext;
 }
 
-
-
 let init_fpm exec_engine fpm =
   (* Set up the optimizer pipeline.  Start with registering info about how the
    * target lays out data structures. *)
@@ -41,12 +39,19 @@ let init_fpm exec_engine fpm =
 
   ignore (PassManager.initialize fpm)
   
+let lookup_function name the_module = 
+  match (lookup_function name the_module) with
+    | Some (llvalue) -> llvalue
+    | None -> raise (Error ("function not found " ^ name))
+;;
+
 (* opens a module
  * create a function pass manager
  * run all functions in the module with the fpm *)
 let open_module ctx modname =
   let buff = MemoryBuffer.of_file (modname ^ ".bc") in
   let modl = get_module ctx buff in
+(*  let modl = create_module ctx "FDAF" in *)
   let fpm  = PassManager.create_function modl in
   let run_func fn = PassManager.run_function fn fpm; Llvm_analysis.assert_valid_function fn in
   let _    = iter_functions run_func modl in
@@ -75,7 +80,6 @@ let ctx = init_context "main" ;;
 let builder        = Llvm.builder ctx.llcontext
 let main_module_nm = "main"
 
-
 let rec lltype_from_ty ty = match ty with
   | Unit              -> Llvm.void_type ctx.llcontext
   | Int               -> Llvm.i32_type ctx.llcontext
@@ -97,12 +101,9 @@ let rec lltype_from_ty ty = match ty with
   | _ -> raise (Error ("type not supported " ^ (string_of_ty ty)))
 
 
-
 let lltype_is_void lltype = match classify_type lltype with
   | TypeKind.Void -> true
   | _ -> false
-
-
 
 let translate_name name = 
   match name with
@@ -115,7 +116,9 @@ let translate_name name =
 
 let codegen_proto_in_env env name paramNames ty =
   let ft = lltype_from_ty ty in
+      let _    = print_endline ("fn -> " ^ name) in
   let the_func = declare_function name ft ctx.main_module in
+
   let _ = Env.put env name the_func in
   let llparams = Array.to_list (Llvm.params the_func) in
     (* Set names for all arguments. *)
@@ -147,7 +150,6 @@ and codegen_expr_in_env env expr = match expr with
   | Lint (num)           -> const_int (Llvm.i32_type ctx.llcontext) num
   | Lfn (name, ty, paramNames, body)       ->
       let name = translate_name name in
-      let _    = print_endline ("fn -> " ^ name) in
       (* create the function prototype *)
       let llfunction = codegen_proto_in_env env name paramNames ty in
 	
@@ -155,11 +157,11 @@ and codegen_expr_in_env env expr = match expr with
       let _ = match body with 
 	| Ext -> llfunction
 	| Def (body) -> codegen_lambda env llfunction paramNames body ;
+	    dump_module ctx.main_module;
 	    Llvm_analysis.assert_valid_function llfunction;
 	    llfunction
       in
 	(* Validate the generated code, checking for consistency. *)
-	Llvm.dump_module (ctx.main_module);
 	PassManager.run_function llfunction ctx.fpm;
 	llfunction
   | Llet (name, e1) ->
@@ -188,7 +190,6 @@ and codegen_expr_in_env env expr = match expr with
       let name = if lltype_is_void return_type then "" else "calltmp" in
       let args = List.map (codegen_expr_in_env env) args in
       let res = build_call callee (Array.of_list args) name builder in
-	Llvm.dump_module (ctx.main_module);
 	res
   | Lseq (e1, e2) ->
       let _ = codegen_expr_in_env env e1 in
@@ -201,7 +202,6 @@ let codegen module_name expr =
   try
     let _ = print_endline module_name in
     let expr = codegen_expr_in_env global_env expr in
-    let _ = dump_module ctx.main_module in
       expr
   with
       Error (s) ->
@@ -222,9 +222,7 @@ let execute_expr llval funty =
       (* JIT the function, returning a function pointer. *)
       let _ = dump_value llval in
       let _ = Llvm_analysis.assert_valid_module ctx.main_module in
-      let _ = print_endline "FDASF" in
       let result = ExecutionEngine.run_function llval [||] ctx.exec_engine in
-      let _ = print_endline "FDASF" in
       let kind = classify_type retty in
       let _ = print_string "EVALUATE TO: " in
 	begin
@@ -233,6 +231,7 @@ let execute_expr llval funty =
             | _ -> raise (Error ("unhandled  type " ^ (string_of_lltype retty)))
 	end ;
 	print_newline ()
+
   else
       ()
 let eval_expr llval =

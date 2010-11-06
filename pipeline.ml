@@ -21,6 +21,13 @@ let evaluate eval expr =
   else
     ()
   
+let compile module_name lty =
+  lty >>
+    print_lty >>
+    Semant.process >> 
+    print_lty >>
+   (backend.compile module_name)
+
 (* push a top level expression into the code generation pipeline *)
 let rec push module_name toplevel eval = 
   toplevel >>
@@ -55,12 +62,6 @@ and handle_top_level module_name eval = function
       let lam = Cgil.Lfn (nm, fty, ps, Cgil.Ext) in
       let _ = compile module_name lam in
 	()
-and compile module_name lty =
-  lty >>
-    print_lty >>
-    Semant.process >> 
-    print_lty >>
-   (backend.compile module_name)
  
 ;;
 

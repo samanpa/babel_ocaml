@@ -18,7 +18,7 @@ extern "C" BABEL_EXPORT int int_mul (int x, int y) {
 }
 
 extern "C" BABEL_EXPORT double double_int_add (double x, int y) {
-	printf ("%d %d\n", x, y);
+	printf ("%f %d\n", x, y);
 	return x + y;
 }
 

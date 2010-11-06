@@ -79,6 +79,7 @@ clean:
 	rm -f parser.ml parser.mli lexer.ml lexer.mli parser.output
 	rm -f scratch*
 	rm -f a.out
+	rm -f *.ll *.bc
 
 tar: clean
 	tar -czf $(OUTPUT).tar.gz *

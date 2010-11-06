@@ -41,7 +41,7 @@ let lift ex =
   let lst, ex = lambda_lift [] ex in
   let rec mk_seq = function
     | [] -> failwith "empty expression"
-    | [e1] -> print_endline ("FDASF" ^ (to_string e1)) ;e1
+    | [e1] -> e1
     | e1::rest -> print_endline ("EXPR [[" ^ (to_string e1) ^ "]]")  ;Lseq (e1, mk_seq rest)
   in
   let lst = ex :: lst in

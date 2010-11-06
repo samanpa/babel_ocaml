@@ -40,7 +40,7 @@ and uncurry ex =
     | Lapply (f, args)  -> uncurry_application ex
     | Lif (e1, e2, e3)  -> Lif (uncurry e1, uncurry e2, uncurry e3)
     | Llet (nm, e1)     -> Llet (nm, uncurry e1)
-    | Lfn (nm, t, p, b) -> print_endline ("-----" ^nm); let t = uncurry_funty t in
+    | Lfn (nm, t, p, b) -> let t = uncurry_funty t in
 	                      begin
 				match b with
 				  | Ext     -> Lfn (nm, t, p, b)
