@@ -45,7 +45,7 @@ let wrap (ty, lty) =
 let rec to_string = function
   | Lfn (nm, t, _, b) -> begin
       match b with
-	| Ext -> "external" ^ "fun " ^ nm ^ ": " ^ (string_of_ty t) ^ "\n"
+	| Ext -> "external " ^ "fun " ^ nm ^ ": " ^ (string_of_ty t) ^ "\n"
 	| Def b -> "fun " ^ nm ^ ": " ^ (string_of_ty t) ^ "\n\t" ^ (to_string b)
     end
   | Llet (nm, e)      -> "let " ^ nm ^ " = " ^ (to_string e)
