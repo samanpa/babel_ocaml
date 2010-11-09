@@ -3,7 +3,6 @@ open Gamma
 open Operations
 open Unify
 open Texpr
-open Typing
 
 let rec infer gamma = function
   | IntLit (n)           -> (IntEx (n), TApp ("int", []))
@@ -51,7 +50,7 @@ let rec infer gamma = function
       let funTy = List.fold_right (fun an tp1 -> mkFun (extractTy an) tp1) instLst rho2 in
       let funTy = generalize gamma funTy in
       let params = List.map (fun (nm,_) -> nm) annotNms in
-	LamEx (convert_type funTy, params, Def (expr)), funTy
+	LamEx (funTy, params, Def (expr)), funTy
  
   | App (e1, e2) ->
       let (e1, tp1) = infer gamma e1 in

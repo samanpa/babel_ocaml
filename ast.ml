@@ -59,7 +59,7 @@ let rec string_of_toplevel = function
   | Expr (e)        -> string_of_expr e
   | Open (str)      -> "open " ^ str
   | Extern (nm, tp) -> let tp = string_of_expr_type tp in
-      "extern " ^ nm ^ " : " ^ tp
+      "external " ^ nm ^ " : " ^ tp
 
 (* helper functions *)
 

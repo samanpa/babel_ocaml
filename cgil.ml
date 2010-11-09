@@ -35,6 +35,7 @@ and mk_fun nm t p body =
     | Texpr.Ext -> Ext
     | Texpr.Def body -> Def (from_lty body)
   in
+  let t = convert_type t in
     Lfn (nm, t, p, body)
 
 let wrap (ty, lty) =

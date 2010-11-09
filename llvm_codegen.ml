@@ -116,7 +116,6 @@ let translate_name name =
 
 let codegen_proto_in_env env name paramNames ty =
   let ft = lltype_from_ty ty in
-      let _    = print_endline ("fn -> " ^ name) in
   let the_func = declare_function name ft ctx.main_module in
 
   let _ = Env.put env name the_func in
@@ -200,7 +199,6 @@ let global_env : llvalue Env.t = Env.create None;;
 
 let codegen module_name expr =
   try
-    let _ = print_endline module_name in
     let expr = codegen_expr_in_env global_env expr in
       expr
   with

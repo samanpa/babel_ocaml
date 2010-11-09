@@ -1,5 +1,4 @@
 open Types
-open Typing
 
 type name = string
 
@@ -11,7 +10,7 @@ and lty =   IntEx of int
 	   | UnitEx
 	   | VarEx of name
 	   | CallEx of lty * lty
-	   | LamEx of t * name list * fnDef
+	   | LamEx of termType * name list * fnDef
 	   | IfEx of lty * lty * lty
 	   | LetEx of name * lty * lty
 ;;
@@ -45,7 +44,7 @@ let rec convert_from_astTy = function
 
 
 let rec string_of_lty = function 
-  | VarEx (nm)      -> nm
+  | VarEx (nm)         -> nm
  
   | UnitEx             -> "unit"
 
@@ -60,7 +59,7 @@ let rec string_of_lty = function
 			    | Def (b) -> string_of_lty b
                           in 
 			  let params = String.concat ", " p in
-			  let ty = string_of_ty t in
+			  let ty = string_of_type t in
 			    "fun " ^ params ^ " : " ^ ty ^ " =\n\t " ^ body
 
   | LetEx (nm, t1, t2) -> let t1 = string_of_lty t1 in
