@@ -10,10 +10,10 @@ let print_toplevel toplevel =
   let _   = print_endline ("parsed expr:\n\t" ^ toplevel_str) in
     toplevel
 
-let print_lty lty =
-  let str = Cgil.to_string lty in
-  let _   = print_endline ("typed expr :\n\t" ^ str) in
-    lty
+let print_tree fn tree =
+  let str = fn tree in
+  let _   = print_endline ("tree :\n\t" ^ str) in
+    tree
 
 let evaluate eval expr =
   if eval then
@@ -21,11 +21,11 @@ let evaluate eval expr =
   else
     ()
   
-let compile module_name lty =
-  lty >>
-    print_lty >>
+let compile module_name cgil =
+  cgil >>
+    (print_tree Cgil.to_string) >>
     Semant.process >> 
-    print_lty >>
+    (print_tree Cgil.to_string) >>
    (backend.compile module_name)
 
 (* push a top level expression into the code generation pipeline *)
@@ -47,7 +47,7 @@ and handle_top_level module_name eval = function
 	InferBasic.inferType >>
 	fun (lty, ty) -> (Typing.convert_type ty, lty) >>
 	Cgil.wrap >>
-	print_lty >>
+	(print_tree Cgil.to_string) >>
 	compile module_name>>
 	(evaluate eval)
   | Extern (nm, tp) -> 

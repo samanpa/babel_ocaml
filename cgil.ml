@@ -49,8 +49,16 @@ let rec to_string = function
 	| Ext -> "external " ^ "fun " ^ nm ^ ": " ^ (string_of_ty t) ^ "\n"
 	| Def b -> "fun " ^ nm ^ ": " ^ (string_of_ty t) ^ "\n\t" ^ (to_string b)
     end
-  | Llet (nm, e)      -> "let " ^ nm ^ " = " ^ (to_string e)
-  | Lvar (nm)         -> nm
-  | Lint lit          -> string_of_int lit
-  | Lseq (e1, e2)     -> (to_string e1) ^ ";\n" ^ (to_string e2)
+  | Llet (nm, e)       -> "let " ^ nm ^ " = " ^ (to_string e)
+  | Lvar (nm)          -> nm
+  | Lint lit           -> string_of_int lit
+  | Lseq (e1, e2)      -> (to_string e1) ^ ";\n" ^ (to_string e2)
+  | Lapply (e1, args)  -> let args = List.map to_string args in
+                          let e1 = to_string e1 in
+			  let args = String.concat "," args in
+			    e1 ^ "(" ^ args ^ ")"
+  | Lif (cond, e1, e2) -> let cond = to_string cond in
+                          let e1 = to_string e1 in
+			  let e2 = to_string e2 in
+			    "if " ^ cond ^ " then\n" ^ e1 ^ "\nelse\n" ^ e2 
   | _         -> "to string f"

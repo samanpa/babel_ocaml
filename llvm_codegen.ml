@@ -83,6 +83,7 @@ let main_module_nm = "main"
 let rec lltype_from_ty ty = match ty with
   | Unit              -> Llvm.void_type ctx.llcontext
   | Int               -> Llvm.i32_type ctx.llcontext
+  | Bool              -> Llvm.i1_type ctx.llcontext
   | Float             -> Llvm.float_type ctx.llcontext
   | FunTy (ptys, rty) ->
       let fn ty = 
@@ -193,6 +194,45 @@ and codegen_expr_in_env env expr = match expr with
   | Lseq (e1, e2) ->
       let _ = codegen_expr_in_env env e1 in
 	codegen_expr_in_env env e2
+  | Lif (cond, e1, e2) -> 
+	(* grab the start block *)
+      let start_bb = insertion_block builder in
+      let func_bb = block_parent start_bb in
+
+	(* code generate the conditional *)
+      let cond_val = codegen_expr_in_env env cond in
+
+      (* emit then block *)
+      let then_bb = append_block ctx.llcontext "then" func_bb in
+      let _ = position_at_end then_bb builder in
+      let then_val = codegen_expr_in_env env e1 in
+      let new_then_bb = insertion_block builder in
+
+      (* emit else block *)
+      let else_bb = append_block ctx.llcontext "else" func_bb in
+      let _ = position_at_end else_bb builder in
+      let else_val = codegen_expr_in_env env e2 in
+      let new_else_bb = insertion_block  builder in
+
+      (* emit branches *)
+      let _ = position_at_end start_bb builder in
+      let _ = build_cond_br cond_val then_bb else_bb builder in
+
+      (* emit merge *)
+      let merge_bb = append_block ctx.llcontext "merge" func_bb in
+      let _ = position_at_end merge_bb builder in
+      let incoming = [(then_val, new_then_bb) ; (else_val, new_else_bb)] in
+      let phi = build_phi incoming "merge" builder in
+
+      (* exit then and else basic blocks *)
+      let _ = position_at_end new_then_bb builder in
+      let _ = build_br merge_bb  builder in
+      let _ = position_at_end new_else_bb builder in
+      let _ = build_br merge_bb builder in
+
+      let _ = position_at_end merge_bb builder in
+	phi
+
   | _ -> failwith ("Can't codegenerate " )
 
 let global_env : llvalue Env.t = Env.create None;;

@@ -10,7 +10,6 @@ let rec infer gamma = function
   | UnitLit              -> (UnitEx, TApp ("unit", []))
 
   | Var (nm)             -> 
-      let _ = print_endline nm in
       let t = gammaFind gamma nm in
 	VarEx (nm), t
 
@@ -59,7 +58,18 @@ let rec infer gamma = function
       let _ = subsume arg tp2 in
       let appTy = generalize gamma res in
 	CallEx (e1, e2), appTy
-   | term ->  failwith ("can not infer type for " ^ (string_of_term term))
+  | If (cond, e1, e2) ->
+      let (cond, condtp) = infer gamma cond in
+      let condtp = instantiate condtp in
+      let _ = match condtp with
+	| TApp ("bool", []) -> ()
+	| _ -> failwith ("expected a boolean in if condition but got " ^ (string_of_type condtp))
+      in
+      let (e1, tp1) = infer gamma e1 in
+      let (e2, tp2) = infer gamma e2 in
+      let _ = unify tp1 tp2 in
+	IfEx (cond, e1, e2), tp1
+  | term ->  failwith ("can not infer type for " ^ (string_of_term term))
 
 
 let inferType term =
