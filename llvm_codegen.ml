@@ -81,11 +81,11 @@ let builder        = Llvm.builder ctx.llcontext
 let main_module_nm = "main"
 
 let rec lltype_from_ty ty = match ty with
-  | Unit              -> Llvm.void_type ctx.llcontext
-  | Int               -> Llvm.i32_type ctx.llcontext
-  | Bool              -> Llvm.i1_type ctx.llcontext
-  | Float             -> Llvm.float_type ctx.llcontext
-  | FunTy (ptys, rty) ->
+  | Unit                 -> Llvm.void_type ctx.llcontext
+  | Int                  -> Llvm.i32_type ctx.llcontext
+  | Bool                 -> Llvm.i1_type ctx.llcontext
+  | Float                -> Llvm.float_type ctx.llcontext
+  | FunTy (_, ptys, rty) ->
       let fn ty = 
 	let llty = lltype_from_ty ty in
 	  match ty with
@@ -96,7 +96,7 @@ let rec lltype_from_ty ty = match ty with
       let llparamTypes = Array.of_list (List.map fn ptys) in
       let llreturnType = lltype_from_ty rty in
         function_type llreturnType llparamTypes
-  | String           ->
+  | String              ->
       let char_type = Llvm.i8_type ctx.llcontext in
 	Llvm.pointer_type char_type
   | _ -> raise (Error ("type not supported " ^ (string_of_ty ty)))

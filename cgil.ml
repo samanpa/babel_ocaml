@@ -39,9 +39,11 @@ and mk_fun nm t p body =
     Lfn (nm, t, p, body)
 
 let wrap (ty, lty) =
-  let cg = from_lty lty in
-  let nm = Utils.get_new_name "fn" in
-    Lfn (nm, FunTy ([], ty), [], Def (cg))
+  let cg   = from_lty lty in
+  let body = Def cg in
+  let nm   = Utils.get_new_name "fn" in
+  let fty  = FunTy (Curried, [], ty) in
+    Lfn (nm, fty, [], body)
 
 let rec to_string = function
   | Lfn (nm, t, _, b) -> begin

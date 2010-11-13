@@ -50,16 +50,17 @@ and handle_top_level module_name eval = function
 	(print_tree Cgil.to_string) >>
 	compile module_name>>
 	(evaluate eval)
-  | Extern (nm, tp) -> 
-      let tp  = Texpr.convert_from_astTy tp in
-      let _   = Gamma.gammaExtend Gamma.gamma0 nm tp in
-      let tp  = Typing.convert_type tp in
-      let fty = Currying.uncurry_funty tp in (* decurry function *)
-      let ps  = match fty with (* get parameer names *)
-	| Typing.FunTy (pty, retTy) -> List.map (fun _ -> Utils.get_new_name "params") pty
-	| _ -> failwith (nm ^ " does not have a function type ")
-      in
-      let lam = Cgil.Lfn (nm, fty, ps, Cgil.Ext) in
+  | Extern (nm, ty) -> 
+      let ty  = Texpr.convert_from_astTy ty in
+      (* add to gamma to aid in type inference *)
+      let _   = Gamma.gammaExtend Gamma.gamma0 nm ty in
+
+      (* convert to Typing.t *)
+      let fty = Typing.convert_type ty in 
+      let numParams = Currying.count_params fty in
+      let params = List.map (fun n -> "params" ^ (string_of_int n)) (Types.range 1 numParams) in
+
+      let lam = Cgil.Lfn (nm, fty, params, Cgil.Ext) in
       let _ = compile module_name lam in
 	()
  
