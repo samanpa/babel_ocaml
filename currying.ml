@@ -17,8 +17,12 @@ let type_env_find nm =
   Hashtbl.find type_env nm
 ;;
 
+let rec count_params = function 
+  | Typing.FunTy (_, _, ty) -> 1 + (count_params ty)
+  | _ -> 0
+;;
 
-let uncurry_funty arity ty =
+let rec uncurry_funty arity ty =
   let fail ty = failwith ("not a function for uncurry ty " ^ (string_of_ty ty)) in
   let rec uncurry arity acc ty = match arity with
     | 0 -> 
@@ -36,19 +40,11 @@ let uncurry_funty arity ty =
     match ty with 
       | FunTy (Curried, _, _) -> 
 	  let (pty, retTy) = uncurry arity [] ty in
+	  (* HACK to allow uncurry of return types *)
+	  let arityRet = count_params retTy in
+	  let retTy = uncurry_funty arityRet retTy in  
 	    FunTy (Uncurried, pty, retTy)
-      | _ -> fail ty
-;;
-
-let rec count_params = function 
-  | Typing.FunTy (_, _, ty) -> 1 + (count_params ty)
-  | _ -> 0
-;;
-
-let uncurry_funty_unknown_arity nm ty =
-  let num_params = count_params ty in
-  let ty = uncurry_funty num_params ty in (* uncurry function *)
-    type_env_add nm ty
+      | _ -> ty
 ;;
 
 let rec extract_app = function

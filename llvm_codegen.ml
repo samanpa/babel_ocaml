@@ -94,7 +94,7 @@ let rec lltype_from_ty ty = match ty with
             | _       -> llty
       in  
       let llparamTypes = Array.of_list (List.map fn ptys) in
-      let llreturnType = lltype_from_ty rty in
+      let llreturnType = fn rty in
         function_type llreturnType llparamTypes
   | String              ->
       let char_type = Llvm.i8_type ctx.llcontext in
