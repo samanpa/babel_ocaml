@@ -5,3 +5,8 @@ external int_mul : int -> int -> int ;;
 external int_gt : int -> int -> bool;;
 external int_lt : int -> int -> bool;;
 
+let ( + ) = int_add;;
+let ( - ) = int_minus;;
+let ( / ) = int_div;;
+let ( * ) = int_mul;;
+

@@ -266,7 +266,7 @@ let execute_expr llval funty =
 	begin
 	  match kind with
             | TypeKind.Integer -> print_int (GenericValue.as_int result)
-            | _ -> raise (Error ("unhandled  type " ^ (string_of_lltype retty)))
+            | _ -> print_endline ("unhandled  type " ^ (string_of_lltype retty))
 	end ;
 	print_newline ()
 

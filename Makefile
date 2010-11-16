@@ -40,7 +40,7 @@ OUTPUT=tensorlang
 
 # The list of object files for the language
 OUTPUT_OBJS=utils.cmx \
-	ast.cmx parser.cmx lexer.cmx parse.cmx \
+	ast.cmx elaborate.cmx parser.cmx lexer.cmx parse.cmx \
 	types.cmx typing.cmx texpr.cmx \
 	gamma.cmx subst.cmx operations.cmx unify.cmx inferBasic.cmx \
 	cgil.cmx lambda_lifting.cmx currying.cmx semant.cmx \

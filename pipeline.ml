@@ -26,7 +26,7 @@ let compile module_name cgil =
     (print_tree Cgil.to_string) >>
     Semant.process >> 
     (print_tree Cgil.to_string) >>
-   (backend.compile module_name)
+    (backend.compile module_name)
 
 (* push a top level expression into the code generation pipeline *)
 let rec push module_name toplevel eval = 
@@ -43,6 +43,7 @@ and handle_top_level module_name eval = function
 	()
   | Expr (ex) -> 
       ex >>
+	Elaborate.elaborate >>
 	Texpr.convert_ast >>
 	InferBasic.inferType >>
 	fun (lty, ty) -> (Typing.convert_type ty, lty) >>
@@ -51,6 +52,7 @@ and handle_top_level module_name eval = function
 	compile module_name>>
 	(evaluate eval)
   | Extern (nm, ty) -> 
+      let _   = Elaborate.elaborate_extern nm in
       let ty  = Texpr.convert_from_astTy ty in
       (* add to gamma to aid in type inference *)
       let _   = Gamma.gammaExtend Gamma.gamma0 nm ty in
