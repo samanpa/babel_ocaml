@@ -43,7 +43,8 @@ OUTPUT_OBJS=utils.cmx \
 	ast.cmx elaborate.cmx parser.cmx lexer.cmx parse.cmx \
 	types.cmx typing.cmx texpr.cmx \
 	gamma.cmx subst.cmx operations.cmx unify.cmx inferBasic.cmx \
-	cgil.cmx lambda_lifting.cmx currying.cmx semant.cmx \
+	cgil.cmx \
+	lambda_lifting.cmx currying.cmx monomorphize.cmx semant.cmx \
 	codegen.cmx llvm_codegen.cmx \
 	pipeline.cmx main.cmx
 
