@@ -164,6 +164,11 @@ operator :
   | INFIXOP4   { $1 }
 ;
 
+tuple_expr :
+  | expr COMMA tuple_expr       { $1 :: $3 }
+  | expr COMMA expr             { $1 :: [ $3 ] }
+;
+
 op_expr :
   | expr PLUS expr              { mk_binop "+" $1 $3 }
   | expr MINUS expr             { mk_binop "-" $1 $3 }
