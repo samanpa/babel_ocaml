@@ -1,14 +1,14 @@
 type name = string
 
-type term = Var of name                           (* x *)
-            | IntLit of int                       (* 1 *)
-	    | UnitLit                             (* unit *)
-	    | If of term * term * term            (* if true then a else b *)
-	    | App of term * term                  (* f x *)
-	    | Lam of name list * term             (* \x y -> x + y*)
-	    | ALam of (name * annot) list * term  (* \x::int -> x *)
-	    | Let of name * term * term           (* let x = f y in x + 1 *)
-	    | Ann of term * annot                 (* (f x) :: int *)
+type term = Var of name                              (* x *)
+            | IntLit of int                          (* 1 *)
+	    | UnitLit                                (* unit *)
+	    | If of term * term * term               (* if true then a else b *)
+	    | App of term * term                     (* f x *)
+	    | Lam of name list * term                (* \x y -> x + y*)
+	    | ALam of name list * annot list * term  (* \x::int -> x *)
+	    | Let of name * term * term              (* let x = f y in x + 1 *)
+	    | Ann of term * annot                    (* (f x) :: int *)
 
 (* type annotation
  * "some a. type". A type annotation is closed under "some" type variables *)
@@ -108,9 +108,9 @@ let rec string_of_term = function
 			let p = List.fold_left concat "" p in
 			  "\\" ^ p ^ " . " ^ tm
 
-  | ALam (nmAnn, tm) -> let tm = string_of_term tm in
-			let nmAnnot (nm, an) = "(" ^ nm ^ " :: " ^ (string_of_annot an) ^ ")" in
-			let nmAnnot = List.map nmAnnot nmAnn in
+  | ALam (p, a, tm)  -> let tm = string_of_term tm in
+			let nmAnnot param annot = "(" ^ param ^ " :: " ^ (string_of_annot annot) ^ ")" in
+			let nmAnnot = List.map2 nmAnnot p a in
 			let nmAnnot = String.concat " " nmAnnot in
                           "\\" ^ nmAnnot ^ " . "  ^ tm
 
