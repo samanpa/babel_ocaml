@@ -157,7 +157,7 @@ and codegen_expr_in_env env expr = match expr with
       let _ = match body with 
 	| Ext -> llfunction
 	| Def (body) -> codegen_lambda env llfunction paramNames body ;
-	    dump_module ctx.main_module;
+	    dump_value llfunction;
 	    Llvm_analysis.assert_valid_function llfunction;
 	    llfunction
       in
