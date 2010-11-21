@@ -14,6 +14,15 @@ let rec infer gamma = function
       let t = gammaFind gamma nm in
 	VarEx (nm), t
 
+  | Let (nm, (Lam _ as lam), letBody) ->
+      (* Add function name to gamma to allow recursion to work *)
+      let (some, lamTy) = instantiateAnnot (gammaDepth gamma) annotAny in
+      let gamma         = gammaExtend gamma nm lamTy in
+      let (lamExpr, ty) = infer gamma lam in
+      let gamma         = gammaExtend gamma nm ty in
+      let (bodyExp, ty) = infer gamma letBody in
+	LetEx (nm, lamExpr, bodyExp), ty
+
   | Let (nm, expr, body) ->
       let (expr, tp) = infer gamma expr in
       let gamma = gammaExtend gamma nm tp in
