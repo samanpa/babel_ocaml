@@ -33,6 +33,31 @@ let rec string_of_ty = function
 			let ty  = string_of_ty ty in
 			  "forall " ^ ids ^ "." ^ ty
 
+let rec equal e1 e2 = match (e1, e2) with
+  | (Unit, Unit)    -> true
+  | (Bool, Bool)    -> true
+  | (Int, Int)      -> true
+  | (Float, Float)  -> true
+  | (FunTy (_, p1, r1), FunTy (_, p2, r2)) -> let requal = equal r1 r2 in
+                                              let pequal = 
+                                                if requal then
+						  let le1 = List.length p1 in
+						  let le2 = List.length p2 in
+						  let res  = 
+						    if le1 == le2 then
+						      let pequals = List.map2 equal p1 p2 in
+						      let id a = a in
+							List.for_all id pequals
+						    else
+						      false
+						  in
+						    res
+						else
+						  false
+					      in
+						pequal
+  | _ -> false
+;;
 
 let rec convert_type = function
   | TApp (nm, con)    -> convert_app nm con
