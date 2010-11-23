@@ -10,6 +10,8 @@ let rec infer gamma = function
 
   | UnitLit              -> (UnitEx, TApp ("unit", []))
 
+  | StrLit (s)           -> (StrEx (s), TApp ("string", []))
+
   | Var (nm)             -> 
       let t = gammaFind gamma nm in
 	VarEx (nm), t

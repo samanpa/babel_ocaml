@@ -8,6 +8,7 @@ type fnDef = | Ext (* externally defined e.g. in C *)
  * suitable for code generation       *)
 and lty =   IntEx of int
 	   | UnitEx
+	   | StrEx of string
 	   | VarEx of name
 	   | CallEx of lty * lty
 	   | LamEx of termType * name list * fnDef
@@ -18,6 +19,8 @@ and lty =   IntEx of int
 
 let rec convert_to_term = function
   | Ast.IntLit n         -> IntLit (n)
+
+  | Ast.StrLit s         -> StrLit (s)
 
   | Ast.UnitLit          -> UnitLit 
 
@@ -47,6 +50,8 @@ let rec string_of_lty = function
   | VarEx (nm)         -> nm
  
   | UnitEx             -> "unit"
+
+  | StrEx (s)          -> "\"" ^ s ^ "\""
 
   | IntEx (lit)        -> string_of_int lit
 

@@ -101,6 +101,7 @@ pat :
 
 expr :
   | INT                         { IntLit ($1) }
+  | STRING                      { StrLit ($1) }
   | ID                          { Var ($1) }
   | BACKSLASH params ARROW expr { Lam ($2, $4) }
   | BACKSLASH params DOT expr   { Lam ($2, $4) }

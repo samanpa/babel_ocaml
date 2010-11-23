@@ -45,12 +45,13 @@ and match_fun acc = function
   | [ret] -> (List.rev acc, ret)
   | param::rest ->  match_fun (param::acc) rest
 and convert_app name params = match name with
-  | "int"  -> Int
-  | "unit" -> Unit
-  | "bool" -> Bool
-  | "->"   -> let params = List.map convert_type params in
-              let params, ret = match_fun [] params in
-		FunTy (Curried, params, ret)
-  | nm    -> failwith ("We can't deal with " ^ nm)
+  | "int"    -> Int
+  | "unit"   -> Unit
+  | "bool"   -> Bool
+  | "string" -> String
+  | "->"     -> let params = List.map convert_type params in
+                let params, ret = match_fun [] params in
+		  FunTy (Curried, params, ret)
+  | nm       -> failwith ("We can't deal with " ^ nm)
 
 

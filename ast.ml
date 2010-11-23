@@ -6,6 +6,7 @@ type t =   TApp of string * t list   (* e.g. int, int list *)
 
 type expr =   Var of name                  (* x *)
 	    | IntLit of int                (* 12 *)
+	    | StrLit of string             (* "string " *)
 	    | UnitLit                      (* () *)
 	    | App of expr * expr           (* f x *)
 	    | Lam of name list * expr      (* \x y -> x + y *)
@@ -24,6 +25,8 @@ let rec string_of_expr = function
   | IntLit n             -> string_of_int (n)
 
   | UnitLit              -> "()"
+
+  | StrLit s             -> "\"" ^ s ^ "\""
 
   | Var nm               -> nm
 

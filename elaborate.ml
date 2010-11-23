@@ -37,8 +37,7 @@ let rec rename bindings = function
 			    | None -> failwith (nm ^ " not found in elaborate phase")
 			  in
 			    Var (new_nm)
-  | IntLit _ as e1     -> e1
-  | UnitLit as e1      -> e1
+  | e1                 -> e1
 ;;
 
 

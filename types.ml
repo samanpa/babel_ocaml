@@ -3,6 +3,7 @@ type name = string
 type term = Var of name                              (* x *)
             | IntLit of int                          (* 1 *)
 	    | UnitLit                                (* unit *)
+	    | StrLit of string                       (* "string lit" *)
 	    | If of term * term * term               (* if true then a else b *)
 	    | App of term * term                     (* f x *)
 	    | Lam of name list * term                (* \x y -> x + y*)
@@ -98,6 +99,8 @@ let rec string_of_term = function
   | IntLit (lit)     -> string_of_int lit
 
   | UnitLit          -> "unit"
+
+  | StrLit s         -> "\"" ^ s ^ "\""
 
   | App (f, a)       -> let f = string_of_term f in
                         let a = string_of_term a in

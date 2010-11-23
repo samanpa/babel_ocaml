@@ -29,3 +29,8 @@ extern "C" BABEL_EXPORT bool int_gt (int x, int y) {
 extern "C" BABEL_EXPORT bool int_lt (int x, int y) {
 	return x < y;
 }
+
+extern "C" BABEL_EXPORT void print (char *str) {
+	printf ("%s\n", str);
+	fflush (stdout);
+}

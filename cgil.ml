@@ -8,6 +8,7 @@ type fnDef = | Ext (* externally defined e.g. in C *)
  * suitable for code generation       *)
 and cgil = | Lint of int
 	   | Lunit
+	   | Lstr of string
 	   | Lvar of name
 	   | Lapply of cgil * cgil list
 	   | Lfn of name * t * name list * fnDef
@@ -19,6 +20,7 @@ let rec from_lty = function
   | IntEx lit           -> Lint (lit)
   | UnitEx              -> Lunit
   | VarEx (nm)          -> Lvar (nm)
+  | StrEx (s)           -> Lstr (s)
   | CallEx (f, a)       -> Lapply (from_lty f, [from_lty a])
   | IfEx (cond, e1, e2) -> Lif (from_lty cond, from_lty e1, from_lty e2)
   | LamEx (t, p, body)  -> 
@@ -53,6 +55,7 @@ let rec to_string = function
     end
   | Llet (nm, e)       -> "let " ^ nm ^ " = " ^ (to_string e)
   | Lvar (nm)          -> nm
+  | Lstr s             -> "\"" ^ s ^ "\""
   | Lint lit           -> string_of_int lit
   | Lseq (e1, e2)      -> (to_string e1) ^ ";\n" ^ (to_string e2)
   | Lapply (e1, args)  -> let args = List.map to_string args in

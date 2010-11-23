@@ -148,6 +148,21 @@ let rec codegen_lambda env llfunction paramNames body =
   
 and codegen_expr_in_env env expr = match expr with
   | Lint (num)           -> const_int (Llvm.i32_type ctx.llcontext) num
+  | Lstr str   -> 
+      let name = get_new_name "__string__" in
+      let str = const_stringz ctx.llcontext str in
+      let gstr = define_global name str ctx.main_module in
+      let strPtr = build_gep
+	gstr
+	[| 
+	  (const_int (Llvm.i32_type ctx.llcontext) 0) ;
+	  (const_int (Llvm.i32_type ctx.llcontext) 0)
+	|]
+	"gep"
+	builder
+      in 
+	strPtr
+
   | Lfn (name, ty, paramNames, body)       ->
       let name = translate_name name in
       (* create the function prototype *)
@@ -232,8 +247,7 @@ and codegen_expr_in_env env expr = match expr with
 
       let _ = position_at_end merge_bb builder in
 	phi
-
-  | _ -> failwith ("Can't codegenerate " )
+  | e -> failwith ("Can't codegenerate " ^ (to_string e))
 
 let global_env : llvalue Env.t = Env.create None;;
 

@@ -68,6 +68,7 @@ and uncurry ex =
   let ex =  match ex with
     | Lint _         
     | Lunit
+    | Lstr _
     | Lvar _            -> ex
     | Lapply (f, args)  -> uncurry_application ex
     | Lif (e1, e2, e3)  -> Lif (uncurry e1, uncurry e2, uncurry e3)
