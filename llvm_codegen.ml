@@ -53,8 +53,18 @@ let open_module ctx modname =
   let modl = get_module ctx buff in
 (*  let modl = create_module ctx "FDAF" in *)
   let fpm  = PassManager.create_function modl in
-  let run_func fn = PassManager.run_function fn fpm; Llvm_analysis.assert_valid_function fn in
+  let run_func fn =
+    begin 
+      let _ = PassManager.run_function fn fpm in
+      let _ = dump_value fn in
+	if is_declaration fn then
+	  ()
+	else
+	  Llvm_analysis.assert_valid_function fn
+    end
+  in
   let _    = iter_functions run_func modl in
+  let _ = dump_module modl in
     (modl, fpm)
 
 let init_context name =
