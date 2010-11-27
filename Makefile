@@ -10,7 +10,7 @@ CFLAGS=-I runtime
 
 OUTPUT=tensorlang
 
-SUBDIRS=parsing typing .
+SUBDIRS=parsing typing runtime .
 
 PARSING=parsing/ast.cmx parsing/parser.cmi parsing/parser.cmx parsing/lexer.cmx parsing/parse.cmx
 
@@ -26,7 +26,7 @@ RUNTIME=libruntime$(DLLEXT)
 
 all: INITIAL_BASIS $(OUTPUT) 
 
-INITIAL_BASIS : runtime/initial_basis.bc
+INITIAL_BASIS : initial_basis.bc
 
 $(OUTPUT): $(OUTPUT_OBJS) $(RUNTIME)
 	$(OCAMLOPT) -o $@ $(OCAMLOPTFLAGS) $(OCAMLLLVMFLAGS) $(filter %.cmx, $(OUTPUT_OBJS))
