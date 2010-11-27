@@ -1,3 +1,4 @@
+open Ast
 
 type name = string
 
@@ -11,15 +12,17 @@ type lambda = | IntEx of int
 	      | LetEx of name * lambda * lambda
 	      | StringEx of string
 
-let rec of_ast = function
-  | Ast.IntLit n -> IntEx (n)
-  | Ast.FloatLit (f) -> FloatEx (f)
-  | Ast.Var nm -> VarEx (nm)
-  | Ast.Lam (p, body) -> LamEx (p, of_ast body)
-  | Ast.App (func, args) -> 
-      let args = of_ast args in
-	CallEx (of_ast func, [args])
-  | Ast.Let (nm, e1, e2) -> LetEx (nm, of_ast e1, of_ast e2)
-  | Ast.If (con, e1, e2) -> IfEx (of_ast con, of_ast e1, of_ast e2)
-  | Ast.StrLit (str) -> StringEx (str)
-  | Ast.UnitLit -> UnitEx
+let rec uncurry ex acc = match ex with
+  | App (func, arg) -> uncurry func (arg::acc)
+  | _ -> ex, acc
+and of_ast = function
+  | IntLit n -> IntEx (n)
+  | FloatLit (f) -> FloatEx (f)
+  | Var nm -> VarEx (nm)
+  | Lam (p, body) -> LamEx (p, of_ast body)
+  | App (func, arg) -> let func, args = uncurry func [arg] in
+                         CallEx (of_ast func, List.map of_ast args)
+  | Let (nm, e1, e2) -> LetEx (nm, of_ast e1, of_ast e2)
+  | If (con, e1, e2) -> IfEx (of_ast con, of_ast e1, of_ast e2)
+  | StrLit (str) -> StringEx (str)
+  | UnitLit -> UnitEx

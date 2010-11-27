@@ -10,7 +10,8 @@ CFLAGS=-I runtime
 
 SUBDIRS=parsing typing runtime codegen dyn .
 
-PARSING=parsing/ast.cmx parsing/parser.cmi parsing/parser.cmx parsing/lexer.cmx parsing/parse.cmx
+PARSING=parsing/ast.cmx parsing/parser.cmi parsing/parser.cmx parsing/lexer.cmx \
+	parsing/parse.cmx parsing/elaborate.cmx 
 
 TYPING=typing/types.cmx typing/typing.cmx typing/gamma.cmx typing/subst.cmx \
 	typing/operations.cmx typing/unify.cmx typing/texpr.cmx typing/inferBasic.cmx 
@@ -22,8 +23,7 @@ CODEGEN=codegen/cgil.cmx codegen/lambda_lifting.cmx codegen/currying.cmx \
 DYNAMIC=dyn/lambda.cmx dyn/value.cmx dyn/initialBasis.cmx dyn/runtime.cmx dyn/eval.cmx \
 	dyn/dynpipeline.cmx dyn/main.cmx
 
-TL_OBJS=utils.cmx $(PARSING) elaborate.cmx $(TYPING) $(CODEGEN) \
-	pipeline.cmx main.cmx
+TL_OBJS=utils.cmx $(PARSING) $(TYPING) $(CODEGEN) pipeline.cmx main.cmx
 
 DTL_OBJS=utils.cmx $(PARSING) $(DYNAMIC)
 

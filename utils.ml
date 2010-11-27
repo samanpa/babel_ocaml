@@ -45,9 +45,7 @@ module Env = struct
   ;;
 
   let put env name value =
-    match find env name with
-      | None -> Hashtbl.add env.bindings name value
-      | Some (value) -> raise (Already_bound name)
+    Hashtbl.add env.bindings name value
 
   let add env name value = Hashtbl.add env.bindings name value
 end

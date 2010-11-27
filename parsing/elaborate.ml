@@ -19,8 +19,6 @@ let rec rename bindings = function
   | Lam (params, body) -> let fenv = Env.create (Some (bindings)) in
                           let rename_param p = 
 			    let new_p = Utils.get_new_name p in
-			    let _ = print_endline new_p in
-			    let _ = print_endline p in
 			    let _ = Env.put fenv p new_p in
 			      new_p
 			  in
@@ -34,7 +32,7 @@ let rec rename bindings = function
   | Var (nm)           -> let new_nm_opt = Env.find bindings nm in
                           let new_nm = match new_nm_opt with
 			    | Some (new_nm) -> new_nm
-			    | None -> failwith (nm ^ " not found in elaborate phase")
+			    | None -> nm
 			  in
 			    Var (new_nm)
   | e1                 -> e1
