@@ -94,7 +94,7 @@ let rec lltype_from_ty ty = match ty with
   | Unit                 -> Llvm.void_type ctx.llcontext
   | Int                  -> Llvm.i32_type ctx.llcontext
   | Bool                 -> Llvm.i1_type ctx.llcontext
-  | Float                -> Llvm.float_type ctx.llcontext
+  | Float                -> Llvm.double_type ctx.llcontext
   | FunTy (_, ptys, rty) ->
       let fn ty = 
 	let llty = lltype_from_ty ty in
@@ -158,6 +158,7 @@ let rec codegen_lambda env llfunction paramNames body =
   
 and codegen_expr_in_env env expr = match expr with
   | Lint (num)           -> const_int (Llvm.i32_type ctx.llcontext) num
+  | Lfloat (num)         -> const_float (Llvm.double_type ctx.llcontext) num
   | Lstr str   -> 
       let name = get_new_name "__string__" in
       let str = const_stringz ctx.llcontext str in
@@ -290,6 +291,7 @@ let execute_expr llval funty =
 	begin
 	  match kind with
             | TypeKind.Integer -> print_int (GenericValue.as_int result)
+	    | TypeKind.Double  -> print_float (GenericValue.as_float (double_type ctx.llcontext) result)
             | _ -> print_endline ("unhandled  type " ^ (string_of_lltype retty))
 	end ;
 	print_newline ()

@@ -6,6 +6,7 @@ type t =   TApp of string * t list   (* e.g. int, int list *)
 
 type expr =   Var of name                  (* x *)
 	    | IntLit of int                (* 12 *)
+	    | FloatLit of float            (* 11.5 *)
 	    | StrLit of string             (* "string " *)
 	    | UnitLit                      (* () *)
 	    | App of expr * expr           (* f x *)
@@ -23,6 +24,8 @@ type toplevel =
 (* string conversion *)
 let rec string_of_expr = function
   | IntLit n             -> string_of_int (n)
+
+  | FloatLit n           -> string_of_float n
 
   | UnitLit              -> "()"
 

@@ -67,6 +67,7 @@ let rec uncurry_application func =
 and uncurry ex = 
   let ex =  match ex with
     | Lint _         
+    | Lfloat _
     | Lunit
     | Lstr _
     | Lvar _            -> ex

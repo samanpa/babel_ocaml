@@ -7,6 +7,7 @@ type fnDef = | Ext (* externally defined e.g. in C *)
 (* typed lambda intermidiate language
  * suitable for code generation       *)
 and cgil = | Lint of int
+	   | Lfloat of float
 	   | Lunit
 	   | Lstr of string
 	   | Lvar of name
@@ -18,6 +19,7 @@ and cgil = | Lint of int
 
 let rec from_lty = function
   | IntEx lit           -> Lint (lit)
+  | FloatEx lit         -> Lfloat (lit)
   | UnitEx              -> Lunit
   | VarEx (nm)          -> Lvar (nm)
   | StrEx (s)           -> Lstr (s)

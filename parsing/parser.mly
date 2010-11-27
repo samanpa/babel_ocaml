@@ -101,6 +101,7 @@ pat :
 
 expr :
   | INT                         { IntLit ($1) }
+  | FLOAT                       { FloatLit ($1) }
   | STRING                      { StrLit ($1) }
   | ID                          { Var ($1) }
   | BACKSLASH params ARROW expr { Lam ($2, $4) }
@@ -135,18 +136,23 @@ let_expr :
       let var = Var (nm) in
 	Let (nm, $4, var)
     }
-  | LET ID params EQUAL expr    { 
-      let func = Lam ($3, $5) in
-      let var  = Var ($2) in
-	Let ($2, func, var)
-    }
   | LET LPAREN operator RPAREN EQUAL expr {
       let e1 = $6 in
       let nm = $3 in
       let var = Var (nm) in
 	Let (nm, e1, var)
     }
-
+  | LET ID params EQUAL expr    { 
+      let func = Lam ($3, $5) in
+      let var  = Var ($2) in
+	Let ($2, func, var)
+    }
+  | LET LPAREN operator RPAREN  params EQUAL expr {
+      let func = Lam ($5, $7) in
+      let nm = $3 in
+      let var = Var (nm) in
+	Let (nm, func, var)
+    }
 ;
 
 operator :
@@ -155,7 +161,7 @@ operator :
   | TIMES      { "*" }
   | DIV        { "/" }
   | GT         { ">" }
-  | LT         { "LT" }
+  | LT         { "<" }
   | EQ         { "==" }
   | RANGE_OP   { ".." }
   | INFIXOP0   { $1 }
@@ -187,5 +193,10 @@ op_expr :
       let binop = mk_binop ":|" $3 $5 in
 	Let (nm, binop, var)
     }
+;
+
+tuple_expr :
+  | expr COMMA tuple_expr       { $1 :: $3 }
+  | expr COMMA expr             { $1 ::[$3] }
 ;
 

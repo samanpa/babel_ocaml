@@ -46,6 +46,7 @@ and match_fun acc = function
   | param::rest ->  match_fun (param::acc) rest
 and convert_app name params = match name with
   | "int"    -> Int
+  | "float"  -> Float
   | "unit"   -> Unit
   | "bool"   -> Bool
   | "string" -> String

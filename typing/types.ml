@@ -1,7 +1,8 @@
 type name = string
 
-type term = Var of name                              (* x *)
+type term = | Var of name                            (* x *)
             | IntLit of int                          (* 1 *)
+	    | FloatLit of float                      (* 1.2 *)
 	    | UnitLit                                (* unit *)
 	    | StrLit of string                       (* "string lit" *)
 	    | If of term * term * term               (* if true then a else b *)
@@ -97,6 +98,8 @@ let rec string_of_term = function
   | Var (nm)         -> nm
 
   | IntLit (lit)     -> string_of_int lit
+
+  | FloatLit (lit)     -> string_of_float lit
 
   | UnitLit          -> "unit"
 

@@ -8,8 +8,10 @@ open List
 let rec infer gamma = function
   | IntLit (n)           -> (IntEx (n), TApp ("int", []))
 
-  | UnitLit              -> (UnitEx, TApp ("unit", []))
+  | FloatLit (f)         -> (FloatEx (f), TApp ("float", []))
 
+  | UnitLit              -> (UnitEx, TApp ("unit", []))
+      
   | StrLit (s)           -> (StrEx (s), TApp ("string", []))
 
   | Var (nm)             -> 

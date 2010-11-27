@@ -6,7 +6,8 @@ type fnDef = | Ext (* externally defined e.g. in C *)
 	     | Def of lty
 (* typed lambda intermidiate language
  * suitable for code generation       *)
-and lty =   IntEx of int
+and lty =  | IntEx of int
+	   | FloatEx of float
 	   | UnitEx
 	   | StrEx of string
 	   | VarEx of name
@@ -19,6 +20,8 @@ and lty =   IntEx of int
 
 let rec convert_to_term = function
   | Ast.IntLit n         -> IntLit (n)
+
+  | Ast.FloatLit n       -> FloatLit (n)
 
   | Ast.StrLit s         -> StrLit (s)
 
@@ -54,6 +57,8 @@ let rec string_of_lty = function
   | StrEx (s)          -> "\"" ^ s ^ "\""
 
   | IntEx (lit)        -> string_of_int lit
+
+  | FloatEx (lit)      -> string_of_float lit
 
   | CallEx (f, a)      -> let f = string_of_lty f in
                           let a = string_of_lty a in
