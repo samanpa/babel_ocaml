@@ -1,6 +1,6 @@
 include Makefile.common
 
-INCLUDES=-I $(LLVMOCAMLLIB) -I parsing -I typing
+INCLUDES=-I $(LLVMOCAMLLIB) -I parsing -I typing -I codegen 
 OCAMLFLAGS=-g $(INCLUDES)
 OCAMLOPTFLAGS=-warn-error P -g $(INCLUDES)
 OCAMLLLVMFLAGS=-cclib -lstdc++ -cclib -L. -cclib -lruntime \
@@ -10,17 +10,20 @@ CFLAGS=-I runtime
 
 OUTPUT=tensorlang
 
-SUBDIRS=parsing typing runtime .
+SUBDIRS=parsing typing runtime codegen .
 
 PARSING=parsing/ast.cmx parsing/parser.cmi parsing/parser.cmx parsing/lexer.cmx parsing/parse.cmx
 
 TYPING=typing/types.cmx typing/typing.cmx typing/gamma.cmx typing/subst.cmx \
 	typing/operations.cmx typing/unify.cmx typing/texpr.cmx typing/inferBasic.cmx 
 
+CODEGEN=codegen/cgil.cmx codegen/lambda_lifting.cmx codegen/currying.cmx \
+	codegen/monomorphize.cmx codegen/semant.cmx codegen/codegen.cmx \
+	codegen/llvm_codegen.cmx
+
 # The list of object files for the language
-OUTPUT_OBJS=utils.cmx $(PARSING) elaborate.cmx $(TYPING) \
-	cgil.cmx lambda_lifting.cmx currying.cmx semant.cmx \
-	codegen.cmx llvm_codegen.cmx pipeline.cmx main.cmx
+OUTPUT_OBJS=utils.cmx $(PARSING) elaborate.cmx $(TYPING) $(CODEGEN) \
+	pipeline.cmx main.cmx
 
 RUNTIME=libruntime$(DLLEXT)
 
@@ -57,4 +60,3 @@ tar: clean
 depend:
 	$(OCAMLDEP) $(INCLUDES) *.mli *.ml > .depend
 #include .depend
-
