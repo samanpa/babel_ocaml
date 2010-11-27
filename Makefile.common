@@ -1,3 +1,5 @@
+include Makefile.generated
+
 OCAMLC=ocamlc
 OCAMLOPT=ocamlopt
 OCAMLDEP=ocamldep
@@ -30,9 +32,9 @@ DISTCLEANCMD    = rm -rf $(DISTCLEANFILES)
 .mly.mli:
 	$(OCAMLYACC) -v $<
 .cc.o:
-	$(CPP) -I. `$(LLVMCONFIG) --cxxflags` $< -c -o $@
+	$(CPP) $(CFLAGS) -I. `$(LLVMCONFIG) --cxxflags` $< -c -o $@
 .cc.ll:
-	clang -O3 -S -emit-llvm -I . $< -o $@
+	clang -O3 -S -emit-llvm -I . $(CFLAGS) $< -o $@
 .ll.bc:
 	llvm-as $< -o $@
 

@@ -1,4 +1,3 @@
-include Makefile.generated
 include Makefile.common
 
 INCLUDES=-I $(LLVMOCAMLLIB) -I parsing -I typing
@@ -7,6 +6,7 @@ OCAMLOPTFLAGS=-warn-error P -g $(INCLUDES)
 OCAMLLLVMFLAGS=-cclib -lstdc++ -cclib -L. -cclib -lruntime \
     llvm.cmxa llvm_executionengine.cmxa llvm_target.cmxa llvm_scalar_opts.cmxa \
     llvm_analysis.cmxa llvm_bitwriter.cmxa llvm_bitreader.cmxa
+CFLAGS=-I runtime
 
 OUTPUT=tensorlang
 
@@ -18,31 +18,27 @@ TYPING=typing/types.cmx typing/typing.cmx typing/gamma.cmx typing/subst.cmx \
 	typing/operations.cmx typing/unify.cmx typing/texpr.cmx typing/inferBasic.cmx 
 
 # The list of object files for the language
-OUTPUT_OBJS=utils.cmx \
-	$(PARSING) elaborate.cmx \
-	$(TYPING) \
+OUTPUT_OBJS=utils.cmx $(PARSING) elaborate.cmx $(TYPING) \
 	cgil.cmx lambda_lifting.cmx currying.cmx semant.cmx \
-	codegen.cmx llvm_codegen.cmx \
-	pipeline.cmx main.cmx
+	codegen.cmx llvm_codegen.cmx pipeline.cmx main.cmx
 
 RUNTIME=libruntime$(DLLEXT)
 
 all: INITIAL_BASIS $(OUTPUT) 
 
-INITIAL_BASIS : initial_basis.bc
+INITIAL_BASIS : runtime/initial_basis.bc
 
 $(OUTPUT): $(OUTPUT_OBJS) $(RUNTIME)
 	$(OCAMLOPT) -o $@ $(OCAMLOPTFLAGS) $(OCAMLLLVMFLAGS) $(filter %.cmx, $(OUTPUT_OBJS))
 
-$(RUNTIME) : runtime.o
-	gcc $< `$(LLVMCONFIG) --ldflags --libs` -shared -o $@
+$(RUNTIME) : runtime/runtime.o
+	gcc $(CFLAGS) $< `$(LLVMCONFIG) --ldflags --libs` -shared -o $@
 
 scratch: test
 	./test > scratch.ll 2>&1 
 	llc scratch.ll
 	gcc scratch.s -o scratch
 
-# Clean up
 clean:
 	rm -f $(OUTPUT)
 	rm -f parsing/parser.ml parsing/parser.mli parsing/lexer.ml parsing/lexer.mli parsing/parser.output
