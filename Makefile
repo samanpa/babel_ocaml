@@ -1,6 +1,6 @@
 include Makefile.common
 
-INCLUDES=-I $(LLVMOCAMLLIB) -I parsing -I typing -I codegen 
+INCLUDES=-I $(LLVMOCAMLLIB) -I parsing -I typing -I codegen -I dyn
 OCAMLFLAGS=-g $(INCLUDES)
 OCAMLOPTFLAGS=-warn-error P -g $(INCLUDES)
 OCAMLLLVMFLAGS=-cclib -lstdc++ -cclib -L. -cclib -lruntime \
@@ -8,9 +8,7 @@ OCAMLLLVMFLAGS=-cclib -lstdc++ -cclib -L. -cclib -lruntime \
     llvm_analysis.cmxa llvm_bitwriter.cmxa llvm_bitreader.cmxa
 CFLAGS=-I runtime
 
-OUTPUT=tensorlang
-
-SUBDIRS=parsing typing runtime codegen .
+SUBDIRS=parsing typing runtime codegen dyn .
 
 PARSING=parsing/ast.cmx parsing/parser.cmi parsing/parser.cmx parsing/lexer.cmx parsing/parse.cmx
 
@@ -21,18 +19,23 @@ CODEGEN=codegen/cgil.cmx codegen/lambda_lifting.cmx codegen/currying.cmx \
 	codegen/monomorphize.cmx codegen/semant.cmx codegen/codegen.cmx \
 	codegen/llvm_codegen.cmx
 
-# The list of object files for the language
-OUTPUT_OBJS=utils.cmx $(PARSING) elaborate.cmx $(TYPING) $(CODEGEN) \
+DYNAMIC=dyn/lambda.cmx dyn/value.cmx dyn/initialBasis.cmx dyn/runtime.cmx dyn/eval.cmx \
+	dyn/dynpipeline.cmx dyn/main.cmx
+
+TL_OBJS=utils.cmx $(PARSING) elaborate.cmx $(TYPING) $(CODEGEN) \
 	pipeline.cmx main.cmx
+
+DTL_OBJS=utils.cmx $(PARSING) $(DYNAMIC)
 
 RUNTIME=libruntime$(DLLEXT)
 
-all: INITIAL_BASIS $(OUTPUT) 
+all: tensorlang dyntl
 
-INITIAL_BASIS : initial_basis.bc
+tensorlang: $(TL_OBJS) initial_basis.bc $(RUNTIME)
+	$(OCAMLOPT) -o $@ $(OCAMLOPTFLAGS) $(OCAMLLLVMFLAGS) $(filter %.cmx, $(TL_OBJS))
 
-$(OUTPUT): $(OUTPUT_OBJS) $(RUNTIME)
-	$(OCAMLOPT) -o $@ $(OCAMLOPTFLAGS) $(OCAMLLLVMFLAGS) $(filter %.cmx, $(OUTPUT_OBJS))
+dyntl: $(DTL_OBJS) 
+	$(OCAMLOPT) -o $@ $(OCAMLOPTFLAGS) $(filter %.cmx, $(DTL_OBJS))
 
 $(RUNTIME) : runtime/runtime.o
 	gcc $(CFLAGS) $< `$(LLVMCONFIG) --ldflags --libs` -shared -o $@
@@ -43,7 +46,7 @@ scratch: test
 	gcc scratch.s -o scratch
 
 clean:
-	rm -f $(OUTPUT)
+	rm -f tensorlang dyntl
 	rm -f parsing/parser.ml parsing/parser.mli parsing/lexer.ml parsing/lexer.mli parsing/parser.output
 	for dir in $(SUBDIRS); do \
 		rm -f $$dir/*.cm[iox] $$dir/*.o *~; \

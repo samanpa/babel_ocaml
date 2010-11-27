@@ -36,12 +36,15 @@
 %token LPAREN
 %token LET
 %token LT
+%token LSQ_BRACKET
+%token LT_BAR
 %token MINUS
 %token OPEN
 %token <string> PREFIXOP
 %token PLUS
 %token RPAREN
 %token RBRACE
+%token RSQ_BRACKET
 %token SEMI
 %token <string> STRING
 %token THEN
@@ -54,7 +57,6 @@
 %token GE
 %token LE
 %token BAR
-%token LT_BAR
 %token BAR_GT
 %token DOT
 %token BANG

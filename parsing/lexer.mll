@@ -95,6 +95,8 @@ rule token = parse
   | '}'    { RBRACE }
   | ':'    { COLON }
   | ';'    { SEMI }
+  | '['    { LSQ_BRACKET }
+  | ']'    { RSQ_BRACKET }
   | ";;"   { DOUBLE_SEMI }
   | ','    { COMMA }
   | '@'    { AT }
@@ -112,7 +114,7 @@ rule token = parse
   | ".."   { RANGE_OP }
   | "`"    { BACKTICK }
   | "->"   { ARROW }
-  | ['=' '<' '>' '|' '&' '$'] symbolchar *
+  | ['=' '<' '>' '|' '&' '$' ':' ] symbolchar *
             { INFIXOP0 (Lexing.lexeme lexbuf) }
   | ['@' '^'] symbolchar *
             { INFIXOP1 (Lexing.lexeme lexbuf) }
