@@ -1,0 +1,40 @@
+OCAMLC=ocamlc
+OCAMLOPT=ocamlopt
+OCAMLDEP=ocamldep
+OCAMLYACC=ocamlyacc
+OCAMLLEX=ocamllex
+DLLEXT=.so
+CPP=gcc
+
+SHELL           = bash
+DORECURSIVE     = for dir in $(SUBDIRS); do \
+                        make -C $$dir $@ || exit 1; \
+                  done
+CLEANCMD        = rm -rf $(CLEANFILES)
+DISTCLEANCMD    = rm -rf $(DISTCLEANFILES)
+
+#########
+# rules #
+#########
+.SUFFIXES: .ml .mli .cmo .cmi .cmx .mll .mly .ll .bc
+.ml.cmo:
+	$(OCAMLC) $(OCAMLFLAGS) -c $<
+.mli.cmi:
+	$(OCAMLC) $(OCAMLFLAGS) -c $<
+.ml.cmx:
+	$(OCAMLOPT) $(OCAMLOPTFLAGS) -c $<
+.mll.ml:
+	$(OCAMLLEX) $<
+.mly.ml:
+	$(OCAMLYACC) -v $<
+.mly.mli:
+	$(OCAMLYACC) -v $<
+.cc.o:
+	$(CPP) -I. `$(LLVMCONFIG) --cxxflags` $< -c -o $@
+.cc.ll:
+	clang -O3 -S -emit-llvm -I . $< -o $@
+.ll.bc:
+	llvm-as $< -o $@
+
+#this to try and make compile the default rule
+all             : compile
