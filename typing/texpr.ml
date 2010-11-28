@@ -10,6 +10,7 @@ and lty =  | IntEx of int
 	   | FloatEx of float
 	   | RecordEx of lty list
 	   | StrEx of string
+	   | SelectEx of lty * int
 	   | VarEx of name
 	   | CallEx of lty * lty
 	   | LamEx of termType * name list * fnDef
@@ -26,6 +27,8 @@ let rec convert_to_term = function
   | Ast.StrLit s         -> StrLit (s)
 
   | Ast.Tuple t          -> Tup (List.map convert_to_term t)
+
+  | Ast.Select (t, i)    -> Sel (convert_to_term t, i)
 
   | Ast.Var nm           -> Var (nm)
 
@@ -56,6 +59,7 @@ let rec string_of_lty = function
                           let t = String.concat ", " t in
 			    "(" ^ t ^ ")"
 
+  | SelectEx (t, i)    -> (string_of_lty t) ^ "[" ^ (string_of_int i) ^ "]"
   | StrEx (s)          -> "\"" ^ s ^ "\""
 
   | IntEx (lit)        -> string_of_int lit

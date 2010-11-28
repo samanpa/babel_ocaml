@@ -57,7 +57,7 @@ and convert_app name params = match name with
   | "->"     -> let params = List.map convert_type params in
                 let params, ret = match_fun [] params in
 		  FunTy (Curried, params, ret)
-  | ","      -> StructTy (List.map convert_type params)
+  | "*"      -> StructTy (List.map convert_type params)
   | nm       -> failwith ("We can't deal with " ^ nm)
 
 

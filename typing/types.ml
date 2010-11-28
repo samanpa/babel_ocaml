@@ -4,6 +4,7 @@ type term = | Var of name                            (* x *)
             | IntLit of int                          (* 1 *)
 	    | FloatLit of float                      (* 1.2 *)
 	    | Tup of term list                       (* (1, 2, 4) *)
+	    | Sel of term * int
 	    | StrLit of string                       (* "string lit" *)
 	    | If of term * term * term               (* if true then a else b *)
 	    | App of term * term                     (* f x *)
@@ -105,6 +106,7 @@ let rec string_of_term = function
                         let t = String.concat ", " t in
 			  "(" ^ t ^ ")"
 
+  | Sel (e, i)       -> (string_of_term e) ^ "[" ^ (string_of_int i) ^ "]"
   | StrLit s         -> "\"" ^ s ^ "\""
 
   | App (f, a)       -> let f = string_of_term f in

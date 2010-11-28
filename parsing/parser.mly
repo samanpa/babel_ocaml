@@ -189,6 +189,9 @@ op_expr :
   | expr BAR expr               { mk_binop "|" $1 $3 }
   | expr BANG expr BAR_GT expr  { mk_app (mk_binop "!|>" $1 $3) [$5] }
   | expr LT_BAR expr BANG expr  { mk_app (mk_binop "<|!" $1 $3) [$5] }
+  | expr LSQ_BRACKET INT RSQ_BRACKET {
+      Select ($1, $3)
+    }
   | ID COLON expr BAR expr      { 
       let nm = $1 in
       let var = Var (nm) in

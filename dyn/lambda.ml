@@ -33,3 +33,7 @@ and of_ast = function
 	let f = VarEx ("tuple") in
 	  CallEx (f, t)
   | Tuple (t) -> IntEx (1)
+  | Select (t, i) ->
+      let f = VarEx ("getItem") in
+	CallEx (f, [of_ast t; IntEx (i)])
+

@@ -8,6 +8,7 @@ type expr =   Var of name                  (* x *)
 	    | IntLit of int                (* 12 *)
 	    | FloatLit of float            (* 11.5 *)
 	    | StrLit of string             (* "string " *)
+	    | Select of expr * int         (* a [1] *)
 	    | Tuple of expr list           (* (1, 2) *)
 	    | App of expr * expr           (* f x *)
 	    | Lam of name list * expr      (* \x y -> x + y *)
@@ -31,6 +32,7 @@ let rec string_of_expr = function
                             let t = String.concat "," t in
 			      "(" ^ t ^ ")"
 
+  | Select (s, i)        -> (string_of_expr s) ^ "[" ^ (string_of_int i) ^ "]"
   | StrLit s             -> "\"" ^ s ^ "\""
 
   | Var nm               -> nm

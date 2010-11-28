@@ -272,13 +272,38 @@ and codegen_expr_in_env env expr = match expr with
 
       let _ = position_at_end merge_bb builder in
 	phi
-  | Ltuple (t) ->
-      let t   = List.map (codegen_expr_in_env env) t in
-      let ty  = List.map type_of t in
-      let ty  = Array.of_list ty in
-      let ty  = Llvm.pointer_type (Llvm.struct_type ctx.llcontext ty) in
-      let sz  = codegen_alloc ty in
-	sz
+  | Ltuple (ex) ->
+      let fetch i = const_int (Llvm.i32_type ctx.llcontext) i in
+      let exs = List.map (codegen_expr_in_env env) ex in
+      let ty  = exs >>
+	List.map type_of >>
+	Array.of_list >>
+	Llvm.struct_type ctx.llcontext >>
+	Llvm.pointer_type
+      in
+      let loc = codegen_alloc ty in
+      let func i ex = 
+	let loci = build_gep loc [| fetch 0 ; fetch i |] "gep" builder in
+	  build_store ex loci builder
+      in
+      let _ = exs >>
+	Array.of_list >>
+	Array.mapi func
+      in
+	loc
+  | Lselect (e, i) ->
+      let e = codegen_expr_in_env env e in
+      let sel = build_gep
+	e
+	[| 
+	  (const_int (Llvm.i32_type ctx.llcontext) 0) ;
+	  (const_int (Llvm.i32_type ctx.llcontext) i)
+	|]
+	"gep"
+	builder
+      in 
+      let item = build_load sel "load" builder in
+	item
 ;;	    
 
 let global_env : llvalue Env.t = Env.create None;;

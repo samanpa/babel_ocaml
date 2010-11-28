@@ -69,8 +69,9 @@ and uncurry ex =
     | Lint _         
     | Lfloat _
     | Lstr _
-    | Ltuple _
     | Lvar _            -> ex
+    | Ltuple (exs)      -> Ltuple (List.map uncurry exs)
+    | Lselect (ex, i)   -> Lselect (uncurry ex, i)
     | Lapply (f, args)  -> uncurry_application ex
     | Lif (e1, e2, e3)  -> Lif (uncurry e1, uncurry e2, uncurry e3)
     | Llet (nm, e1)     -> Llet (nm, uncurry e1)

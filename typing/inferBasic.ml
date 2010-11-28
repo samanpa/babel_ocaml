@@ -13,10 +13,16 @@ let rec infer gamma = function
   | Tup (t)              -> let fst (a, _) = a in
                             let snd (_, a) = a in
 			    let res = List.map (infer gamma) t in
-			    let ty = TApp (",", List.map snd res) in
+			    let ty = TApp ("*", List.map snd res) in
 			    let ex = RecordEx (List.map fst res) in
 			      ex, ty
       
+  | Sel (ex, i)          -> let (ex, ty) = infer gamma ex in
+                            let ty = match ty with
+			      | TApp ("*", args) -> List.nth args i
+			      | _ -> failwith "Can not select from a non tuple"
+			    in
+			      SelectEx (ex, i), ty
   | StrLit (s)           -> (StrEx (s), TApp ("string", []))
 
   | Var (nm)             -> 
@@ -50,13 +56,14 @@ let rec infer gamma = function
       let gammaExtendLam param ty gamma = gammaExtendLam gamma param ty in
 
       let rank     = (gammaDepth gamma) + 1 in
-      let someTps  = map (instantiateAnnot rank) annots in (* instantiate the "some" quantifiers *)
+      (* instantiate the "some" quantifiers *)
+      let someTps  = map (instantiateAnnot rank) annots in
       let tps      = map extractTp someTps in
       let newGamma = fold_right2 gammaExtendLam params tps gamma in
       let (expr, resTy)   = infer newGamma expr in
       (* lambda bodies are instantiated *)
       let resRho  = instantiate resTy in
-        (* check that we don't infer polytypes for arguments *)
+      (* check that we don't infer polytypes for arguments *)
 	(*   
       let ssome = listSubst some in
           let _= check (all isTau ssome) ("Using unannoted parameter(s) polymorphically with type(s): " ++ show ssome) in    
