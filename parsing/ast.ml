@@ -8,7 +8,7 @@ type expr =   Var of name                  (* x *)
 	    | IntLit of int                (* 12 *)
 	    | FloatLit of float            (* 11.5 *)
 	    | StrLit of string             (* "string " *)
-	    | UnitLit                      (* () *)
+	    | Tuple of expr list           (* (1, 2) *)
 	    | App of expr * expr           (* f x *)
 	    | Lam of name list * expr      (* \x y -> x + y *)
 	    | Let of name * expr * expr    (* let x = f y in x + 1 *)
@@ -27,7 +27,9 @@ let rec string_of_expr = function
 
   | FloatLit n           -> string_of_float n
 
-  | UnitLit              -> "()"
+  | Tuple t              -> let t = List.map string_of_expr t in
+                            let t = String.concat "," t in
+			      "(" ^ t ^ ")"
 
   | StrLit s             -> "\"" ^ s ^ "\""
 

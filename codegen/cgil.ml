@@ -8,7 +8,7 @@ type fnDef = | Ext (* externally defined e.g. in C *)
  * suitable for code generation       *)
 and cgil = | Lint of int
 	   | Lfloat of float
-	   | Lunit
+	   | Ltuple of cgil list
 	   | Lstr of string
 	   | Lvar of name
 	   | Lapply of cgil * cgil list
@@ -20,7 +20,7 @@ and cgil = | Lint of int
 let rec from_lty = function
   | IntEx lit           -> Lint (lit)
   | FloatEx lit         -> Lfloat (lit)
-  | UnitEx              -> Lunit
+  | RecordEx t          -> Ltuple (List.map from_lty t)
   | VarEx (nm)          -> Lvar (nm)
   | StrEx (s)           -> Lstr (s)
   | CallEx (f, a)       -> Lapply (from_lty f, [from_lty a])
@@ -68,4 +68,7 @@ let rec to_string = function
                           let e1 = to_string e1 in
 			  let e2 = to_string e2 in
 			    "if " ^ cond ^ " then\n" ^ e1 ^ "\nelse\n" ^ e2 
-  | _         -> "to string f"
+  | Lfloat f           -> string_of_float f
+  | Ltuple t           -> let t = List.map to_string t in
+                          let t = String.concat ", " t in
+			    "(" ^ t ^ ")"

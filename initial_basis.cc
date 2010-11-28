@@ -1,5 +1,6 @@
 #include <babel.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 extern "C" BABEL_EXPORT int int_add (int x, int y) {
 	return x + y;
@@ -33,4 +34,8 @@ extern "C" BABEL_EXPORT bool int_lt (int x, int y) {
 extern "C" BABEL_EXPORT void print (char *str) {
 	printf ("%s\n", str);
 	fflush (stdout);
+}
+
+extern "C" BABEL_EXPORT void * tsalloc (int size) {
+	return malloc (size);
 }

@@ -25,4 +25,11 @@ and of_ast = function
   | Let (nm, e1, e2) -> LetEx (nm, of_ast e1, of_ast e2)
   | If (con, e1, e2) -> IfEx (of_ast con, of_ast e1, of_ast e2)
   | StrLit (str) -> StringEx (str)
-  | UnitLit -> UnitEx
+  | Tuple (t) -> 
+      if List.length t == 0 then
+	UnitEx
+      else
+	let t = List.map of_ast t in
+	let f = VarEx ("tuple") in
+	  CallEx (f, t)
+  | Tuple (t) -> IntEx (1)

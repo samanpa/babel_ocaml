@@ -7,23 +7,30 @@
 %}
 
 %token ARROW
+%token AT
 %token BACKSLASH
 %token BACKTICK
+%token BANG
+%token BAR
+%token BAR_GT
 %token BEGIN
 %token COLON
 %token COMMA
 %token DIV
+%token DOT
 %token DOUBLE_SEMI
 %token <string> ID
 %token <float> FLOAT
-%token AT
 %token <string> COMMENT
 %token ELSE
 %token EOF
 %token END
+%token EQ
 %token EQUAL
 %token EXTERN
 %token FUNCTION
+%token GE
+%token GT
 %token IF
 %token IN
 %token <string> INFIXOP0
@@ -33,8 +40,9 @@
 %token <string> INFIXOP4
 %token <int> INT
 %token LBRACE
-%token LPAREN
+%token LE
 %token LET
+%token LPAREN
 %token LT
 %token LSQ_BRACKET
 %token LT_BAR
@@ -42,6 +50,7 @@
 %token OPEN
 %token <string> PREFIXOP
 %token PLUS
+%token RANGE_OP
 %token RPAREN
 %token RBRACE
 %token RSQ_BRACKET
@@ -50,16 +59,6 @@
 %token THEN
 %token TIMES
 %token UNIT
-
-%token RANGE_OP
-%token EQ
-%token GT
-%token GE
-%token LE
-%token BAR
-%token BAR_GT
-%token DOT
-%token BANG
 
 /* Precedences and associativities.*/
 %left SEMI
@@ -115,12 +114,13 @@ expr :
   | LPAREN expr RPAREN          { $2 }
   | IF expr THEN expr ELSE expr { If ($2, $4, $6) }
   | expr BACKTICK ID BACKTICK expr { mk_app (Var ($3)) [$1; $5] }
-  | op_expr                        { $1 }
-  | expr SEMI expr                 { 
+  | op_expr                      { $1 }
+  | expr SEMI expr               { 
       let nm = Utils.get_new_name "var" in
 	Let (nm, $1, $3)
     }
-  | LPAREN RPAREN               { UnitLit }
+  | LPAREN tuple_expr RPAREN     { Tuple $2 }
+  | UNIT                         { Tuple [] }
 ;
 
 infix_expr : 
@@ -198,6 +198,7 @@ op_expr :
 ;
 
 tuple_expr :
+  | expr                        { [$1] }
   | expr COMMA tuple_expr       { $1 :: $3 }
   | expr COMMA expr             { $1 ::[$3] }
 ;

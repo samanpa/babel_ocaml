@@ -114,6 +114,7 @@ rule token = parse
   | ".."   { RANGE_OP }
   | "`"    { BACKTICK }
   | "->"   { ARROW }
+  | "()"   { UNIT }
   | ['=' '<' '>' '|' '&' '$' ':' ] symbolchar *
             { INFIXOP0 (Lexing.lexeme lexbuf) }
   | ['@' '^'] symbolchar *

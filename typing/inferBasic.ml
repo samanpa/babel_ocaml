@@ -10,7 +10,12 @@ let rec infer gamma = function
 
   | FloatLit (f)         -> (FloatEx (f), TApp ("float", []))
 
-  | UnitLit              -> (UnitEx, TApp ("unit", []))
+  | Tup (t)              -> let fst (a, _) = a in
+                            let snd (_, a) = a in
+			    let res = List.map (infer gamma) t in
+			    let ty = TApp (",", List.map snd res) in
+			    let ex = RecordEx (List.map fst res) in
+			      ex, ty
       
   | StrLit (s)           -> (StrEx (s), TApp ("string", []))
 

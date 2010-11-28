@@ -8,7 +8,7 @@ type fnDef = | Ext (* externally defined e.g. in C *)
  * suitable for code generation       *)
 and lty =  | IntEx of int
 	   | FloatEx of float
-	   | UnitEx
+	   | RecordEx of lty list
 	   | StrEx of string
 	   | VarEx of name
 	   | CallEx of lty * lty
@@ -25,7 +25,7 @@ let rec convert_to_term = function
 
   | Ast.StrLit s         -> StrLit (s)
 
-  | Ast.UnitLit          -> UnitLit 
+  | Ast.Tuple t          -> Tup (List.map convert_to_term t)
 
   | Ast.Var nm           -> Var (nm)
 
@@ -52,7 +52,9 @@ let rec convert_from_astTy = function
 let rec string_of_lty = function 
   | VarEx (nm)         -> nm
  
-  | UnitEx             -> "unit"
+  | RecordEx (t)       -> let t = List.map string_of_lty t in
+                          let t = String.concat ", " t in
+			    "(" ^ t ^ ")"
 
   | StrEx (s)          -> "\"" ^ s ^ "\""
 

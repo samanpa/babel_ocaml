@@ -3,7 +3,7 @@ type name = string
 type term = | Var of name                            (* x *)
             | IntLit of int                          (* 1 *)
 	    | FloatLit of float                      (* 1.2 *)
-	    | UnitLit                                (* unit *)
+	    | Tup of term list                       (* (1, 2, 4) *)
 	    | StrLit of string                       (* "string lit" *)
 	    | If of term * term * term               (* if true then a else b *)
 	    | App of term * term                     (* f x *)
@@ -99,9 +99,11 @@ let rec string_of_term = function
 
   | IntLit (lit)     -> string_of_int lit
 
-  | FloatLit (lit)     -> string_of_float lit
+  | FloatLit (lit)   -> string_of_float lit
 
-  | UnitLit          -> "unit"
+  | Tup (t)          -> let t = List.map string_of_term t in
+                        let t = String.concat ", " t in
+			  "(" ^ t ^ ")"
 
   | StrLit s         -> "\"" ^ s ^ "\""
 

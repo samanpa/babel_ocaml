@@ -39,12 +39,6 @@ let init_fpm exec_engine fpm =
 
   ignore (PassManager.initialize fpm)
   
-let lookup_function name the_module = 
-  match (lookup_function name the_module) with
-    | Some (llvalue) -> llvalue
-    | None -> raise (Error ("function not found " ^ name))
-;;
-
 (* opens a module
  * create a function pass manager
  * run all functions in the module with the fpm *)
@@ -64,7 +58,6 @@ let open_module ctx modname =
     end
   in
   let _    = iter_functions run_func modl in
-  let _ = dump_module modl in
     (modl, fpm)
 
 let init_context name =
@@ -109,6 +102,10 @@ let rec lltype_from_ty ty = match ty with
   | String              ->
       let char_type = Llvm.i8_type ctx.llcontext in
 	Llvm.pointer_type char_type
+  | StructTy (tys)      -> let tys = List.map lltype_from_ty tys in
+                           let tys = Array.of_list tys in
+			     Llvm.pointer_type (Llvm.struct_type ctx.llcontext tys)
+
   | _ -> raise (Error ("type not supported " ^ (string_of_ty ty)))
 
 
@@ -134,6 +131,23 @@ let codegen_proto_in_env env name paramNames ty =
     (* Set names for all arguments. *)
     List.iter2 set_value_name paramNames llparams;
     the_func
+
+let lookup_function name = 
+  match lookup_function name ctx.main_module with
+    | Some (llvalue) -> llvalue
+    | None -> failwith ("Can not find function nameed " ^ name)
+;;
+      
+
+let codegen_alloc ty =
+  let target_data = ExecutionEngine.target_data ctx.exec_engine in
+  let size = abi_size target_data (element_type ty) in
+  let size = const_int (Llvm.i32_type ctx.llcontext) (Int64.to_int size) in
+  let fn   = lookup_function "tsalloc" in
+  let call = build_call fn [| size |] "tsalloc" builder in
+  let res  = build_bitcast call ty "cast" builder in
+    res  
+  ;;
 
 let rec codegen_lambda env llfunction paramNames body =
   (* create a new environment *)
@@ -258,7 +272,14 @@ and codegen_expr_in_env env expr = match expr with
 
       let _ = position_at_end merge_bb builder in
 	phi
-  | e -> failwith ("Can't codegenerate " ^ (to_string e))
+  | Ltuple (t) ->
+      let t   = List.map (codegen_expr_in_env env) t in
+      let ty  = List.map type_of t in
+      let ty  = Array.of_list ty in
+      let ty  = Llvm.pointer_type (Llvm.struct_type ctx.llcontext ty) in
+      let sz  = codegen_alloc ty in
+	sz
+;;	    
 
 let global_env : llvalue Env.t = Env.create None;;
 

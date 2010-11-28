@@ -9,6 +9,7 @@ type t = | Unit
 	 | Int
 	 | Float
 	 | String
+	 | StructTy of t list
 	 | FunTy of curryTy * t list * t
 	 | Poly of id list * t
 	 | VarTy of id
@@ -28,6 +29,9 @@ let rec string_of_ty = function
 			let r = string_of_ty r in
 			  pl ^ " -> " ^ r
   | VarTy (id)       -> string_of_int id
+  | StructTy (t)     -> let t = List.map string_of_ty t in
+                        let t = String.concat ", " t in
+			  "{" ^ t ^ "}"
   | Poly (id, ty)    -> let ids = List.map string_of_int id in
                         let ids = String.concat ", " ids in
 			let ty  = string_of_ty ty in
@@ -53,6 +57,7 @@ and convert_app name params = match name with
   | "->"     -> let params = List.map convert_type params in
                 let params, ret = match_fun [] params in
 		  FunTy (Curried, params, ret)
+  | ","      -> StructTy (List.map convert_type params)
   | nm       -> failwith ("We can't deal with " ^ nm)
 
 
