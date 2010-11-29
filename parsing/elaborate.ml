@@ -35,6 +35,8 @@ let rec rename bindings = function
 			    | None -> nm
 			  in
 			    Var (new_nm)
+  | Tuple (t)          -> Tuple (List.map (rename bindings) t)
+  | Select (ex, idx)   -> Select (rename bindings ex, idx)
   | e1                 -> e1
 ;;
 

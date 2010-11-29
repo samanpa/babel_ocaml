@@ -1,0 +1,15 @@
+- unify dyn/lambda.ml with codegen/cgil.ml
+
+- Let variables carry their types
+  A variable is currently defined in cgil as
+    Lvar (name)
+  We want it to be 
+    Lvar (type, name)
+
+  Advantages
+  - Makes finding types in cgil much easier
+
+  Disadvantages
+  - Memory overhead. Not necessary since a hashmap does the same job
+    and a hashmap is needed anyway
+
