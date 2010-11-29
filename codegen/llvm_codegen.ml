@@ -329,7 +329,6 @@ let execute_expr llval funty =
   let numParams = Array.length (param_types funty) in
     if numParams == 0 then
       (* JIT the function, returning a function pointer. *)
-      let _ = dump_value llval in
       let _ = Llvm_analysis.assert_valid_module ctx.main_module in
       let result = ExecutionEngine.run_function llval [||] ctx.exec_engine in
       let kind = classify_type retty in

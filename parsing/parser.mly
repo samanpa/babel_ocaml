@@ -130,30 +130,21 @@ infix_expr :
   | expr INFIXOP3 expr          { mk_binop $2 $1 $3 }
   | expr INFIXOP4 expr          { mk_binop $2 $1 $3 }
 
-/*FIXME : need to simplify rules */
+let_lhs :
+  | LPAREN operator RPAREN         { $2 }
+  | ID                             { $1 }
+
 let_expr :
-  | LET ID EQUAL expr IN expr   { Let ($2, $4, $6)  }
-  | LET ID EQUAL expr { 
+  | LET let_lhs EQUAL expr IN expr { Let ($2, $4, $6)  }
+  | LET let_lhs EQUAL expr         { 
       let nm = $2 in
       let var = Var (nm) in
 	Let (nm, $4, var)
     }
-  | LET LPAREN operator RPAREN EQUAL expr {
-      let e1 = $6 in
-      let nm = $3 in
-      let var = Var (nm) in
-	Let (nm, e1, var)
-    }
-  | LET ID params EQUAL expr    { 
+  | LET let_lhs params EQUAL expr    { 
       let func = Lam ($3, $5) in
       let var  = Var ($2) in
 	Let ($2, func, var)
-    }
-  | LET LPAREN operator RPAREN  params EQUAL expr {
-      let func = Lam ($5, $7) in
-      let nm = $3 in
-      let var = Var (nm) in
-	Let (nm, func, var)
     }
 ;
 
