@@ -113,15 +113,6 @@ let lltype_is_void lltype = match classify_type lltype with
   | TypeKind.Void -> true
   | _ -> false
 
-let translate_name name = 
-  match name with
-    | "+" -> "plus"
-    | "-" -> "minus"
-    | "/" -> "diff"
-    | "*" -> "times"
-    | nm  -> nm
-;;
-
 let codegen_proto_in_env env name paramNames ty =
   let ft = lltype_from_ty ty in
   let the_func = declare_function name ft ctx.main_module in
@@ -189,7 +180,6 @@ and codegen_expr_in_env env expr = match expr with
 	strPtr
 
   | Lfn (name, ty, paramNames, body)       ->
-      let name = translate_name name in
       (* create the function prototype *)
       let llfunction = codegen_proto_in_env env name paramNames ty in
 	
@@ -205,12 +195,10 @@ and codegen_expr_in_env env expr = match expr with
 	PassManager.run_function llfunction ctx.fpm;
 	llfunction
   | Llet (name, e1) ->
-      let name = translate_name name in
       let e1 = codegen_expr_in_env env e1 in
       let _  = Env.put env name e1 in
 	e1
   | Lvar (nm) ->
-      let nm = translate_name nm in
       begin
 	match Env.find env nm with
 	  | Some (value) -> value
