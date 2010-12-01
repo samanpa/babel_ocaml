@@ -38,5 +38,3 @@ DISTCLEANCMD    = rm -rf $(DISTCLEANFILES)
 .ll.bc:
 	llvm-as $< -o $@
 
-#this to try and make compile the default rule
-all             : compile
