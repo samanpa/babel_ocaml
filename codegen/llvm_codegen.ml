@@ -85,8 +85,11 @@ let main_module_nm = "main"
 
 let rec lltype_from_ty ty = match ty with
   | Unit                 -> Llvm.void_type ctx.llcontext
-  | Int                  -> Llvm.i32_type ctx.llcontext
   | Bool                 -> Llvm.i1_type ctx.llcontext
+  | Char                 -> Llvm.i8_type ctx.llcontext
+  | Int                  -> Llvm.i32_type ctx.llcontext
+  | Int16                -> Llvm.i16_type ctx.llcontext
+  | Int64                -> Llvm.i64_type ctx.llcontext
   | Float                -> Llvm.double_type ctx.llcontext
   | FunTy (_, ptys, rty) ->
       let fn ty = 
@@ -98,7 +101,7 @@ let rec lltype_from_ty ty = match ty with
       in  
       let llparamTypes = Array.of_list (List.map fn ptys) in
       let llreturnType = fn rty in
-        function_type llreturnType llparamTypes
+	function_type llreturnType llparamTypes
   | String              ->
       let char_type = Llvm.i8_type ctx.llcontext in
 	Llvm.pointer_type char_type

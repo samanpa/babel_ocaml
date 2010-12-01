@@ -82,8 +82,20 @@ toplevel :
 
 
 term_type :
-  | ID                        { TApp ($1, []) }
-  | term_type ARROW term_type { TApp ("->", $1::[$3]) }
+  | LPAREN term_type RPAREN    { $2 }
+  | simple_type                { $1 }
+  | term_type ARROW term_type  { TApp ("->", $1::[$3]) }
+;
+
+simple_type :
+  | ID                         { TApp ($1, []) }
+  | tuple_type                 { TApp ("*", $1) }
+;
+
+tuple_type :
+  | term_type TIMES term_type  { $1 :: [ $3 ] }
+  | term_type TIMES tuple_type { $1 :: $3 }
+;;
 
 params :
   | ID                        { [ $1 ] }
@@ -194,6 +206,5 @@ op_expr :
 tuple_expr :
   | expr                        { [$1] }
   | expr COMMA tuple_expr       { $1 :: $3 }
-  | expr COMMA expr             { $1 ::[$3] }
 ;
 

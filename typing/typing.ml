@@ -6,7 +6,10 @@ type curryTy = | Curried
 	       | Uncurried
 type t = | Unit
 	 | Bool
+	 | Char
 	 | Int
+	 | Int64
+	 | Int16
 	 | Float
 	 | String
 	 | StructTy of t list
@@ -17,7 +20,10 @@ type t = | Unit
 let rec string_of_ty = function
   | Unit             -> "unit"
   | Bool             -> "bool"
+  | Char             -> "char"
   | Int              -> "int"
+  | Int16            -> "short"
+  | Int64            -> "long"
   | Float            -> "float"
   | String           -> "string"
   | FunTy (_, pl, r) -> let pl = List.map string_of_ty pl in
@@ -50,6 +56,9 @@ and match_fun acc = function
   | param::rest ->  match_fun (param::acc) rest
 and convert_app name params = match name with
   | "int"    -> Int
+  | "short"  -> Int16
+  | "long"   -> Int64
+  | "char"   -> Char
   | "float"  -> Float
   | "unit"   -> Unit
   | "bool"   -> Bool
