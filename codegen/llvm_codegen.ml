@@ -144,8 +144,7 @@ let codegen_alloc ty =
   ;;
 
 let rec codegen_lambda env llfunction paramNames body =
-  (* create a new environment *)
-  let funcEnv = Env.create (Some env) in
+  let funcEnv = env in
 	
   (* Create a new basic block to start insertion into. *)
   let func_bb = append_block ctx.llcontext "funcentry" llfunction in
